@@ -3,13 +3,9 @@ version: '3'
 services:
   mysql:
     container_name: ${COMPOSE_PROJECT_NAME}_mysql
-    build: 
-      context: ./.docker/mysql
-      args:
-        USER_ID: ${USER_ID:-0}
-        GROUP_ID: ${GROUP_ID:-0}
+    image: mysql:5
     volumes:
-        - ./data:/var/lib/mysql
+        - mysql-data:/var/lib/mysql
     environment:
         - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
         - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -20,7 +16,7 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME}_phpmyadmin
     image: phpmyadmin/phpmyadmin
     volumes:
-      - .docker/phpMyAdmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+      - .docker/phpmyadmin/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
     environment:
       - PMA_ARBITRARY=${PMA_ARBITRARY}
       - PMA_ABSOLUTE_URI=${PMA_ABSOLUTE_URI}
@@ -30,3 +26,6 @@ services:
     restart: unless-stopped
     depends_on:
       - mysql
+
+volumes:
+  mysql-data:
