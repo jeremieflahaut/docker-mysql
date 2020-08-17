@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   mysql:
@@ -11,6 +11,8 @@ services:
         - MYSQL_DATABASE=${MYSQL_DATABASE}
         - MYSQL_USER=${MYSQL_USER}
         - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    labels:
+      - "traefik.enable=false"
 
   phpmyadmin:
     container_name: ${COMPOSE_PROJECT_NAME}_phpmyadmin
@@ -21,11 +23,21 @@ services:
       - PMA_ARBITRARY=${PMA_ARBITRARY}
       - PMA_ABSOLUTE_URI=${PMA_ABSOLUTE_URI}
       - PMA_HOST=${COMPOSE_PROJECT_NAME}_mysql
-    ports:
-      - "8081:80"
     restart: unless-stopped
+    networks:
+      - antibes
     depends_on:
       - mysql
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`pma.dev-fullstack.net`)"
+      - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
+      - "traefik.http.routers.phpmyadmin.tls.certresolver=myresolver"
 
 volumes:
   mysql-data:
+
+networks:
+  antibes:
+    external: true
+    name: antibes
