@@ -5,12 +5,15 @@ services:
     container_name: ${COMPOSE_PROJECT_NAME}_mysql
     image: mysql:5
     volumes:
-        - mysql-data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
+    networks:
+      - antibes
     environment:
-        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-        - MYSQL_DATABASE=${MYSQL_DATABASE}
-        - MYSQL_USER=${MYSQL_USER}
-        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    restart: unless-stopped
     labels:
       - "traefik.enable=false"
 
@@ -26,10 +29,12 @@ services:
     restart: unless-stopped
     networks:
       - antibes
+    ports:
+      - 8081:80
     depends_on:
       - mysql
     labels:
-      - "traefik.enable=true"
+      - "traefik.enable=false"
       - "traefik.http.routers.phpmyadmin.rule=Host(`pma.dev-fullstack.net`)"
       - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
       - "traefik.http.routers.phpmyadmin.tls.certresolver=myresolver"
